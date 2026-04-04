@@ -1,0 +1,45 @@
+from django import forms
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.models import User
+
+
+class StyledAuthenticationForm(AuthenticationForm):
+    username = forms.CharField(
+        widget=forms.TextInput(attrs={'placeholder': 'Username', 'autocomplete': 'username'})
+    )
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'placeholder': 'Password', 'autocomplete': 'current-password'})
+    )
+
+
+class SignUpForm(UserCreationForm):
+    email = forms.EmailField(required=True)
+
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'password1', 'password2')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].widget.attrs.update({'placeholder': 'Choose a username'})
+        self.fields['email'].widget.attrs.update({'placeholder': 'Email address'})
+        self.fields['password1'].widget.attrs.update({'placeholder': 'Create a password'})
+        self.fields['password2'].widget.attrs.update({'placeholder': 'Confirm password'})
+
+
+class DetectionUploadForm(forms.Form):
+    FILE_TYPE_CHOICES = [
+        ('image', 'Image analysis'),
+        ('video', 'Video analysis'),
+    ]
+
+    title = forms.CharField(
+        max_length=120,
+        widget=forms.TextInput(attrs={'placeholder': 'Example: Test video sample 01'}),
+    )
+    file_type = forms.ChoiceField(choices=FILE_TYPE_CHOICES)
+    uploaded_file = forms.FileField(
+        widget=forms.ClearableFileInput(
+            attrs={'accept': '.jpg,.jpeg,.png,.mp4,.mov,.avi,.mkv,video/*,image/*'}
+        )
+    )

@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard | VerifAI{% endblock %}
+{% block content %}
+<section class="section-head">
+    <div>
+        <p class="eyebrow">Control center</p>
+        <h1>Welcome, {{ user.username }}</h1>
+        <p class="lead">Run image or video screening, then review the saved outcomes below.</p>
+    </div>
+    <a class="primary-button" href="{% url 'detect' %}">New analysis</a>
+</section>
+
+<section class="stats-grid">
+    <article class="stat-card"><span>Total reports</span><strong>{{ stats.total }}</strong></article>
+    <article class="stat-card"><span>Image scans</span><strong>{{ stats.images }}</strong></article>
+    <article class="stat-card"><span>Video scans</span><strong>{{ stats.videos }}</strong></article>
+    <article class="stat-card"><span>Fake detections</span><strong>{{ stats.fake }}</strong></article>
+    <article class="stat-card"><span>Needs review</span><strong>{{ stats.uncertain }}</strong></article>
+</section>
+
+<section class="panel">
+    <div class="panel-header">
+        <h2>Recent analyses</h2>
+        <a href="{% url 'history' %}">View full history</a>
+    </div>
+    {% if records %}
+        <div class="history-list">
+            {% for record in records %}
+                <article class="history-card">
+                    <div>
+                        <p class="meta">{{ record.get_file_type_display }} • {{ record.created_at|date:"d M Y, h:i A" }}</p>
+                        <h3>{{ record.title }}</h3>
+                        <p>{{ record.summary }}</p>
+                    </div>
+                    <span class="result-pill {{ record.result }}">{{ record.result|upper }}</span>
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="empty-state">No analyses yet. Upload your first file to generate a report.</p>
+    {% endif %}
+</section>
+{% endblock %}

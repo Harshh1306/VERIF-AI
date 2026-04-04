@@ -1,0 +1,44 @@
+{
+  "architecture": "efficientnet_b0",
+  "framework": "tensorflow",
+  "image_size": [
+    224,
+    224
+  ],
+  "class_names": [
+    "fake",
+    "real"
+  ],
+  "real_threshold": 0.8,
+  "fake_threshold": 0.8,
+  "uncertain_margin": 0.15,
+  "video_sampling_fps": 1.0,
+  "video_max_frames": 48,
+  "video_max_keyframes": 6,
+  "input_normalization": {
+    "mean": [
+      0.485,
+      0.456,
+      0.406
+    ],
+    "std": [
+      0.229,
+      0.224,
+      0.225
+    ]
+  },
+  "train_args": {
+    "dataset": "C:\\Users\\Harsh\\Desktop\\Verifai_project\\dataset\\image",
+    "batch_size": 64,
+    "epochs_head": 1,
+    "epochs_finetune": 1,
+    "learning_rate": 0.0003,
+    "fine_tune_learning_rate": 5e-05,
+    "validation_split": 0.2,
+    "seed": 42,
+    "sample_limit": 1024,
+    "num_workers": 0,
+    "output_name": "verifai_model_final.pth"
+  },
+  "threshold": 0.483154296875
+}

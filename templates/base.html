@@ -1,0 +1,67 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}VerifAI{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <script defer src="{% static 'js/app.js' %}"></script>
+</head>
+<body>
+    <div class="page-shell">
+        <header class="site-header">
+            <a class="brand" href="{% url 'landing' %}">
+                <span class="brand-mark">V</span>
+                <span>
+                    <strong>VerifAI</strong>
+                    <small>Deepfake Intelligence</small>
+                </span>
+            </a>
+            <nav class="site-nav">
+                <a class="nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}" href="{% url 'about' %}">About</a>
+                {% if user.is_authenticated %}
+                    <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}">Dashboard</a>
+                    <a class="nav-link {% if request.resolver_match.url_name == 'detect' %}active{% endif %}" href="{% url 'detect' %}">Analyze</a>
+                    <a class="nav-link {% if request.resolver_match.url_name == 'history' %}active{% endif %}" href="{% url 'history' %}">History</a>
+                    <form method="post" action="{% url 'logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="ghost-button">Logout</button>
+                    </form>
+                {% else %}
+                    <a class="nav-link {% if request.resolver_match.url_name == 'login' %}active{% endif %}" href="{% url 'login' %}">Login</a>
+                    <a class="primary-link" href="{% url 'signup' %}">Create account</a>
+                {% endif %}
+            </nav>
+        </header>
+
+        {% if messages %}
+            <section class="message-stack">
+                {% for message in messages %}
+                    <div class="message {{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </section>
+        {% endif %}
+
+        <main>
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <div class="analysis-overlay" id="analysisOverlay" aria-hidden="true">
+        <div class="analysis-overlay__panel">
+            <div class="scanner-orbit">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <p class="eyebrow">Analysis in progress</p>
+            <h2>VerifAI is processing your media</h2>
+            <p>The system has started the pipeline and is now generating the result. Video analysis may take a little longer.</p>
+        </div>
+    </div>
+</body>
+</html>

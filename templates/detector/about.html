@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block title %}About Project | VerifAI{% endblock %}
+{% block content %}
+<section class="section-head">
+    <div>
+        <p class="eyebrow">Submission overview</p>
+        <h1>About the VerifAI project</h1>
+        <p class="lead">A deployable deepfake detection platform for image and video analysis, presented through a professional Django web application.</p>
+    </div>
+</section>
+
+<section class="about-grid">
+    <article class="panel">
+        <h2>Project summary</h2>
+        <p>
+            VerifAI is an AI-based deepfake detection system designed to classify uploaded media as real or fake.
+            The final project focuses on image and video detection and intentionally excludes audio analysis to preserve stability.
+        </p>
+    </article>
+    <article class="panel">
+        <h2>Technology stack</h2>
+        <div class="chip-row">
+            <span class="tech-chip">Django</span>
+            <span class="tech-chip">TensorFlow</span>
+            <span class="tech-chip">MobileNetV2</span>
+            <span class="tech-chip">OpenCV</span>
+            <span class="tech-chip">K-Means</span>
+            <span class="tech-chip">SQLite</span>
+        </div>
+    </article>
+    <article class="panel">
+        <h2>System workflow</h2>
+        <div class="flow-list">
+            <div class="flow-step">Image input -> preprocess -> CNN prediction -> Real or Fake</div>
+            <div class="flow-step">Video input -> frame extraction -> embeddings -> K-Means keyframes -> majority vote</div>
+            <div class="flow-step">Login -> upload -> analyze -> save report -> review history</div>
+        </div>
+    </article>
+    <article class="panel">
+        <h2>Why Django</h2>
+        <p>
+            Django provides authentication, routing, template rendering, and database support. It gives the project a deployable product layer and satisfies the minimum DBMS requirement through login and stored user reports.
+        </p>
+    </article>
+    <article class="panel">
+        <h2>Model and detection logic</h2>
+        <p>
+            The model is built in TensorFlow using MobileNetV2 transfer learning for binary classification. Image uploads are analyzed directly, while videos are processed through frame extraction and K-Means clustering to reduce redundant frames and evaluate representative keyframes.
+        </p>
+    </article>
+    <article class="panel">
+        <h2>Limitation</h2>
+        <p>
+            The current system focuses on spatial visual patterns and does not model temporal inconsistencies across frames. It is intended as a stable academic project and demo-ready deepfake screening system.
+        </p>
+    </article>
+</section>
+{% endblock %}

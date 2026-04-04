@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}History | VerifAI{% endblock %}
+{% block content %}
+<section class="section-head">
+    <div>
+        <p class="eyebrow">Stored reports</p>
+        <h1>Detection history</h1>
+        <p class="lead">All reports generated under your account are listed here.</p>
+    </div>
+</section>
+
+<section class="panel">
+    {% if records %}
+        <div class="history-list">
+            {% for record in records %}
+                <article class="history-card">
+                    <div>
+                        <p class="meta">{{ record.get_file_type_display }} • {{ record.created_at|date:"d M Y, h:i A" }}</p>
+                        <h3>{{ record.title }}</h3>
+                        <p>{{ record.summary }}</p>
+                        <p class="meta">Confidence: {{ record.confidence|floatformat:2 }}</p>
+                    </div>
+                    <span class="result-pill {{ record.result }}">{{ record.result|upper }}</span>
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="empty-state">No saved reports yet.</p>
+    {% endif %}
+</section>
+{% endblock %}

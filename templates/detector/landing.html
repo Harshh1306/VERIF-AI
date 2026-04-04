@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}VerifAI{% endblock %}
+{% block content %}
+<section class="landing-hero">
+    <div class="hero-copy">
+        <p class="eyebrow">AI-based deepfake detection system</p>
+        <h1>Detect manipulated images and videos with a clean forensic workflow.</h1>
+        <p class="lead">
+            VerifAI combines MobileNetV2 transfer learning with K-Means keyframe selection
+            to analyze media efficiently and present a decision-ready report.
+        </p>
+        <div class="cta-row">
+            <a class="primary-button" href="{% url 'signup' %}">Start analysis</a>
+            <a class="ghost-button link-button" href="{% url 'login' %}">Sign in</a>
+        </div>
+    </div>
+    <div class="feature-grid">
+        <article class="feature-card">
+            <h3>Image detection</h3>
+            <p>Direct CNN inference on uploaded images using your trained `.h5` model.</p>
+        </article>
+        <article class="feature-card">
+            <h3>Video detection</h3>
+            <p>Frame extraction plus K-Means keyframe voting for efficient video screening.</p>
+        </article>
+        <article class="feature-card">
+            <h3>Secure login</h3>
+            <p>Django authentication and database-backed access with a polished dashboard.</p>
+        </article>
+        <article class="feature-card">
+            <h3>Saved reports</h3>
+            <p>Every analysis is stored so you can revisit results without rerunning uploads.</p>
+        </article>
+    </div>
+</section>
+{% endblock %}

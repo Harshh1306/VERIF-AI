@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Login | VerifAI{% endblock %}
+{% block content %}
+<section class="auth-layout">
+    <div class="hero-card">
+        <p class="eyebrow">Secure access</p>
+        <h1>Professional deepfake screening for images and video.</h1>
+        <p>
+            Sign in to analyze uploads with your TensorFlow model, save each report,
+            and review prediction history from one dashboard.
+        </p>
+    </div>
+    <div class="form-card">
+        <h2>Welcome back</h2>
+        <form method="post" class="stack-form">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            <label>
+                Username
+                {{ form.username.errors }}
+                {{ form.username }}
+            </label>
+            <label>
+                Password
+                {{ form.password.errors }}
+                {{ form.password }}
+            </label>
+            <button type="submit" class="primary-button">Login</button>
+        </form>
+        <p class="muted-copy">Need an account? <a href="{% url 'signup' %}">Create one</a></p>
+    </div>
+</section>
+{% endblock %}

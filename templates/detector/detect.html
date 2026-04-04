@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% block title %}Analyze Media | VerifAI{% endblock %}
+{% block content %}
+<section class="section-head">
+    <div>
+        <p class="eyebrow">Detection workspace</p>
+        <h1>Analyze a new image or video</h1>
+        <p class="lead">Uploads are processed using your trained MobileNetV2 model and K-Means video pipeline.</p>
+    </div>
+</section>
+
+<section class="analysis-grid">
+    <div class="form-card wide">
+        <h2>Upload media</h2>
+        <form method="post" enctype="multipart/form-data" class="stack-form analysis-form" data-analysis-form>
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            <label>
+                Report title
+                {{ form.title.errors }}
+                {{ form.title }}
+            </label>
+            <label>
+                Analysis type
+                {{ form.file_type.errors }}
+                {{ form.file_type }}
+            </label>
+            <label>
+                Media file
+                {{ form.uploaded_file.errors }}
+                {{ form.uploaded_file }}
+            </label>
+            <div class="preview-card" data-preview-card>
+                <div class="preview-card__media" data-preview-media>
+                    <div class="preview-card__empty">
+                        <span class="preview-card__icon">+</span>
+                        <p>Select an image or video to preview it before analysis.</p>
+                    </div>
+                </div>
+                <div class="preview-card__meta">
+                    <strong data-file-name>No file selected</strong>
+                    <span data-file-details>Supported: image and video uploads</span>
+                </div>
+            </div>
+            <button type="submit" class="primary-button">Run detection</button>
+        </form>
+    </div>
+
+    {% if analysis %}
+        <div class="result-card result-card--{{ analysis.label }}">
+            <p class="eyebrow">Detection result</p>
+            <div class="result-status">
+                {% if analysis.label == 'real' %}
+                    <div class="result-badge result-badge--real" aria-hidden="true">
+                        <span class="check-stem"></span>
+                        <span class="check-kick"></span>
+                    </div>
+                {% elif analysis.label == 'fake' %}
+                    <div class="result-badge result-badge--fake" aria-hidden="true">
+                        <span class="cross-line"></span>
+                        <span class="cross-line cross-line--reverse"></span>
+                    </div>
+                {% else %}
+                    <div class="result-badge result-badge--uncertain" aria-hidden="true">
+                        <span class="warning-mark"></span>
+                    </div>
+                {% endif %}
+                <div>
+                    <h2>{{ analysis.label|upper }}</h2>
+                    <p class="confidence">{{ analysis.confidence|floatformat:2 }} confidence</p>
+                </div>
+            </div>
+            <p>{{ analysis.summary }}</p>
+            {% if analysis.label == 'fake' %}
+                <div class="warning-note">
+                    <span class="warning-icon" aria-hidden="true">!</span>
+                    <p>The content appears suspicious. Review the saved report and verify the source before making a final decision.</p>
+                </div>
+            {% elif analysis.label == 'uncertain' %}
+                <div class="warning-note">
+                    <span class="warning-icon" aria-hidden="true">!</span>
+                    <p>The model confidence is not strong enough for a safe automatic decision. Manual review is recommended.</p>
+                </div>
+            {% endif %}
+            <a class="ghost-button link-button" href="{% url 'history' %}">Open saved history</a>
+        </div>
+    {% else %}
+        <div class="result-card placeholder">
+            <p class="eyebrow">Ready state</p>
+            <h2>No file analyzed yet</h2>
+            <p>Upload an image or video to produce a saved detection report.</p>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

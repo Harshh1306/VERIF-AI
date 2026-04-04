@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Create Account | VerifAI{% endblock %}
+{% block content %}
+<section class="auth-layout">
+    <div class="hero-card">
+        <p class="eyebrow">Launch workspace</p>
+        <h1>Create your VerifAI analyst account.</h1>
+        <p>
+            This enables the minimum DBMS layer you asked for: user authentication plus
+            a clean personal workspace for detection history.
+        </p>
+    </div>
+    <div class="form-card">
+        <h2>Create account</h2>
+        <form method="post" class="stack-form">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            <label>
+                Username
+                {{ form.username.errors }}
+                {{ form.username }}
+            </label>
+            <label>
+                Email
+                {{ form.email.errors }}
+                {{ form.email }}
+            </label>
+            <label>
+                Password
+                {{ form.password1.errors }}
+                {{ form.password1 }}
+            </label>
+            <label>
+                Confirm password
+                {{ form.password2.errors }}
+                {{ form.password2 }}
+            </label>
+            <button type="submit" class="primary-button">Create account</button>
+        </form>
+    </div>
+</section>
+{% endblock %}
