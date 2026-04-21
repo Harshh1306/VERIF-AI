@@ -2,21 +2,42 @@ import json
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 
-import cv2
 import numpy as np
-import tensorflow as tf
-from sklearn.cluster import MiniBatchKMeans
+
+_cv2 = None
+_tf = None
+_MiniBatchKMeans = None
 
 
-_original_depthwise_init = tf.keras.layers.DepthwiseConv2D.__init__
+def _get_cv2():
+    global _cv2
+    if _cv2 is None:
+        import cv2
+        _cv2 = cv2
+    return _cv2
 
 
-def _patched_depthwise_init(self, *args, **kwargs):
-    kwargs.pop('groups', None)
-    _original_depthwise_init(self, *args, **kwargs)
+def _get_tf():
+    global _tf
+    if _tf is None:
+        import tensorflow as tf
+        _original_depthwise_init = tf.keras.layers.DepthwiseConv2D.__init__
+
+        def _patched_depthwise_init(self, *args, **kwargs):
+            kwargs.pop('groups', None)
+            _original_depthwise_init(self, *args, **kwargs)
+
+        tf.keras.layers.DepthwiseConv2D.__init__ = _patched_depthwise_init
+        _tf = tf
+    return _tf
 
 
-tf.keras.layers.DepthwiseConv2D.__init__ = _patched_depthwise_init
+def _get_kmeans_cls():
+    global _MiniBatchKMeans
+    if _MiniBatchKMeans is None:
+        from sklearn.cluster import MiniBatchKMeans
+        _MiniBatchKMeans = MiniBatchKMeans
+    return _MiniBatchKMeans
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -63,7 +84,7 @@ def get_image_size():
 def get_model():
     global _MODEL
     if _MODEL is None:
-        _MODEL = tf.keras.models.load_model(MODEL_PATH)
+        _MODEL = _get_tf().keras.models.load_model(MODEL_PATH)
     return _MODEL
 
 
@@ -75,7 +96,7 @@ def get_feature_model():
             embedding_layer = model.get_layer('embedding')
         except ValueError:
             embedding_layer = model.layers[-2]
-        _FEATURE_MODEL = tf.keras.Model(model.input, embedding_layer.output)
+        _FEATURE_MODEL = _get_tf().keras.Model(model.input, embedding_layer.output)
     return _FEATURE_MODEL
 
 
@@ -87,7 +108,7 @@ def get_inference_model():
             embedding_layer = model.get_layer('embedding')
         except ValueError:
             embedding_layer = model.layers[-2]
-        _INFERENCE_MODEL = tf.keras.Model(
+        _INFERENCE_MODEL = _get_tf().keras.Model(
             model.input,
             [model.output, embedding_layer.output],
         )
@@ -96,6 +117,7 @@ def get_inference_model():
 
 def _prepare_image_array(frames):
     image_size = get_image_size()
+    cv2 = _get_cv2()
     processed = [cv2.resize(frame, image_size) for frame in frames]
     batch = np.asarray(processed, dtype=np.float32)
     if not get_metadata().get('input_rescale_in_model', False):
@@ -110,6 +132,7 @@ def _read_uploaded_image(uploaded_file):
     if not file_bytes:
         return None
     buffer = np.frombuffer(file_bytes, dtype=np.uint8)
+    cv2 = _get_cv2()
     return cv2.imdecode(buffer, cv2.IMREAD_COLOR)
 
 
@@ -173,6 +196,7 @@ def predict_image(uploaded_file):
 
 def _extract_video_frames(file_path):
     metadata = get_metadata()
+    cv2 = _get_cv2()
     cap = cv2.VideoCapture(str(file_path))
     fps = cap.get(cv2.CAP_PROP_FPS) or 0
     sample_every = max(1, int(round(fps / metadata['video_sampling_fps']))) if fps > 0 else 12
@@ -210,7 +234,7 @@ def predict_video(uploaded_file):
     if len(frames) <= max_keyframes:
         selected_indices = list(range(len(frames)))
     else:
-        kmeans = MiniBatchKMeans(
+        kmeans = _get_kmeans_cls()(
             n_clusters=max_keyframes,
             random_state=42,
             batch_size=min(1024, len(frames)),
