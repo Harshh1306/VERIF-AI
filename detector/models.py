@@ -25,6 +25,7 @@ class DetectionRecord(models.Model):
     result = models.CharField(max_length=10, choices=RESULT_CHOICES)
     confidence = models.FloatField()
     summary = models.TextField(blank=True)
+    notes = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

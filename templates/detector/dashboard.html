@@ -28,9 +28,12 @@
             {% for record in records %}
                 <article class="history-card">
                     <div>
-                        <p class="meta">{{ record.get_file_type_display }} • {{ record.created_at|date:"d M Y, h:i A" }}</p>
+                        <p class="meta">{{ record.get_file_type_display }} &bull; {{ record.created_at|date:"d M Y, h:i A" }}</p>
                         <h3>{{ record.title }}</h3>
                         <p>{{ record.summary }}</p>
+                        {% if record.notes %}
+                            <p class="record-note"><strong>Notes:</strong> {{ record.notes }}</p>
+                        {% endif %}
                     </div>
                     <span class="result-pill {{ record.result }}">{{ record.result|upper }}</span>
                 </article>

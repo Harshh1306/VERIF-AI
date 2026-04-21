@@ -2,7 +2,17 @@ from django.contrib.auth.views import LogoutView
 from django.urls import path
 
 from .forms import StyledAuthenticationForm
-from .views import UserLoginView, about, dashboard, detect, history, landing, signup
+from .views import (
+    UserLoginView,
+    about,
+    dashboard,
+    delete_record,
+    detect,
+    history,
+    landing,
+    signup,
+    update_record,
+)
 
 
 urlpatterns = [
@@ -18,4 +28,6 @@ urlpatterns = [
     path('dashboard/', dashboard, name='dashboard'),
     path('detect/', detect, name='detect'),
     path('history/', history, name='history'),
+    path('history/<int:pk>/update/', update_record, name='update_record'),
+    path('history/<int:pk>/delete/', delete_record, name='delete_record'),
 ]

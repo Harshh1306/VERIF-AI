@@ -10,17 +10,60 @@
 </section>
 
 <section class="panel">
-    {% if records %}
+    {% if record_forms %}
         <div class="history-list">
-            {% for record in records %}
-                <article class="history-card">
-                    <div>
-                        <p class="meta">{{ record.get_file_type_display }} • {{ record.created_at|date:"d M Y, h:i A" }}</p>
-                        <h3>{{ record.title }}</h3>
-                        <p>{{ record.summary }}</p>
-                        <p class="meta">Confidence: {{ record.confidence|floatformat:2 }}</p>
+            {% for item in record_forms %}
+                <article class="history-card history-card--editable" data-record-card>
+                    <div class="history-card__content">
+                        <div class="history-card__header">
+                            <div>
+                                <p class="meta">{{ item.record.get_file_type_display }} &bull; {{ item.record.created_at|date:"d M Y, h:i A" }}</p>
+                                <h3 data-record-title>{{ item.record.title }}</h3>
+                            </div>
+                            <span class="result-pill {{ item.record.result }}">{{ item.record.result|upper }}</span>
+                        </div>
+                        <p>{{ item.record.summary }}</p>
+                        <p class="meta">Confidence: {{ item.record.confidence|floatformat:2 }}</p>
+                        <p class="record-note" data-record-notes-display>
+                            <strong>Notes:</strong>
+                            {% if item.record.notes %}
+                                {{ item.record.notes }}
+                            {% else %}
+                                No notes added yet.
+                            {% endif %}
+                        </p>
+
+                        <form
+                            method="post"
+                            action="{% url 'update_record' item.record.pk %}"
+                            class="stack-form record-edit-form"
+                            data-async-update
+                        >
+                            {% csrf_token %}
+                            <label>
+                                Edit title
+                                {{ item.form.title }}
+                            </label>
+                            <label>
+                                Reviewer notes
+                                {{ item.form.notes }}
+                            </label>
+                            <div class="record-actions">
+                                <button type="submit" class="primary-button">Save changes</button>
+                            </div>
+                            <p class="inline-status" data-inline-status aria-live="polite"></p>
+                        </form>
+
+                        <form
+                            method="post"
+                            action="{% url 'delete_record' item.record.pk %}"
+                            class="record-delete-form"
+                            data-async-delete
+                        >
+                            {% csrf_token %}
+                            <button type="submit" class="ghost-button danger-button">Delete record</button>
+                        </form>
                     </div>
-                    <span class="result-pill {{ record.result }}">{{ record.result|upper }}</span>
                 </article>
             {% endfor %}
         </div>

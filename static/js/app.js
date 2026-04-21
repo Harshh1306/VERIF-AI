@@ -57,6 +57,104 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    async function handleJsonSubmit(form, onSuccess) {
+        const statusNode = form.closest("[data-record-card]")?.querySelector("[data-inline-status]");
+        if (statusNode) {
+            statusNode.textContent = "Saving...";
+            statusNode.classList.remove("is-error", "is-success");
+        }
+
+        try {
+            const response = await fetch(form.action, {
+                method: "POST",
+                body: new FormData(form),
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest",
+                },
+            });
+            const payload = await response.json();
+
+            if (!response.ok || !payload.ok) {
+                throw new Error(payload.error || "Request failed.");
+            }
+
+            if (typeof onSuccess === "function") {
+                onSuccess(payload);
+            }
+
+            if (statusNode) {
+                statusNode.textContent = payload.message || "Saved.";
+                statusNode.classList.add("is-success");
+            }
+        } catch (error) {
+            if (statusNode) {
+                statusNode.textContent = error.message || "Something went wrong.";
+                statusNode.classList.add("is-error");
+            }
+        }
+    }
+
+    document.querySelectorAll("[data-async-update]").forEach((form) => {
+        form.addEventListener("submit", (event) => {
+            event.preventDefault();
+
+            handleJsonSubmit(form, (payload) => {
+                const card = form.closest("[data-record-card]");
+                const titleNode = card?.querySelector("[data-record-title]");
+                const notesDisplay = card?.querySelector("[data-record-notes-display]");
+
+                if (titleNode) {
+                    titleNode.textContent = payload.title;
+                }
+                if (notesDisplay) {
+                    notesDisplay.innerHTML = `<strong>Notes:</strong> ${payload.notes_display}`;
+                }
+            });
+        });
+    });
+
+    document.querySelectorAll("[data-async-delete]").forEach((form) => {
+        form.addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            const confirmed = window.confirm("Delete this report permanently?");
+            if (!confirmed) {
+                return;
+            }
+
+            const card = form.closest("[data-record-card]");
+            const statusNode = card?.querySelector("[data-inline-status]");
+            if (statusNode) {
+                statusNode.textContent = "Deleting...";
+                statusNode.classList.remove("is-error", "is-success");
+            }
+
+            try {
+                const response = await fetch(form.action, {
+                    method: "POST",
+                    body: new FormData(form),
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest",
+                    },
+                });
+                const payload = await response.json();
+
+                if (!response.ok || !payload.ok) {
+                    throw new Error(payload.error || "Delete failed.");
+                }
+
+                if (card) {
+                    card.remove();
+                }
+            } catch (error) {
+                if (statusNode) {
+                    statusNode.textContent = error.message || "Delete failed.";
+                    statusNode.classList.add("is-error");
+                }
+            }
+        });
+    });
+
     if (fileInput) {
         fileInput.addEventListener("change", renderPreview);
     }

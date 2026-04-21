@@ -2,9 +2,10 @@ from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
-from django.shortcuts import redirect, render
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
 
-from .forms import DetectionUploadForm, SignUpForm
+from .forms import DetectionRecordUpdateForm, DetectionUploadForm, SignUpForm
 from .models import DetectionRecord
 from .services import predict_image, predict_video
 
@@ -92,4 +93,45 @@ def detect(request):
 @login_required
 def history(request):
     records = DetectionRecord.objects.filter(user=request.user)
-    return render(request, 'detector/history.html', {'records': records})
+    record_forms = [
+        {
+            'record': record,
+            'form': DetectionRecordUpdateForm(instance=record),
+        }
+        for record in records
+    ]
+    return render(request, 'detector/history.html', {'record_forms': record_forms})
+
+
+@login_required
+def update_record(request, pk):
+    record = get_object_or_404(DetectionRecord, pk=pk, user=request.user)
+
+    if request.method != 'POST':
+        return JsonResponse({'ok': False, 'error': 'POST request required.'}, status=405)
+
+    form = DetectionRecordUpdateForm(request.POST, instance=record)
+    if form.is_valid():
+        saved_record = form.save()
+        return JsonResponse(
+            {
+                'ok': True,
+                'message': 'Report updated successfully.',
+                'title': saved_record.title,
+                'notes': saved_record.notes,
+                'notes_display': saved_record.notes or 'No notes added yet.',
+            }
+        )
+
+    return JsonResponse({'ok': False, 'errors': form.errors}, status=400)
+
+
+@login_required
+def delete_record(request, pk):
+    record = get_object_or_404(DetectionRecord, pk=pk, user=request.user)
+
+    if request.method != 'POST':
+        return JsonResponse({'ok': False, 'error': 'POST request required.'}, status=405)
+
+    record.delete()
+    return JsonResponse({'ok': True, 'message': 'Report deleted successfully.'})

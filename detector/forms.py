@@ -2,6 +2,8 @@ from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.models import User
 
+from .models import DetectionRecord
+
 
 class StyledAuthenticationForm(AuthenticationForm):
     username = forms.CharField(
@@ -43,3 +45,18 @@ class DetectionUploadForm(forms.Form):
             attrs={'accept': '.jpg,.jpeg,.png,.mp4,.mov,.avi,.mkv,video/*,image/*'}
         )
     )
+
+
+class DetectionRecordUpdateForm(forms.ModelForm):
+    class Meta:
+        model = DetectionRecord
+        fields = ('title', 'notes')
+        widgets = {
+            'title': forms.TextInput(attrs={'placeholder': 'Report title'}),
+            'notes': forms.Textarea(
+                attrs={
+                    'placeholder': 'Add reviewer notes, observations, or next steps',
+                    'rows': 4,
+                }
+            ),
+        }

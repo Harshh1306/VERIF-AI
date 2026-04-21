@@ -328,6 +328,22 @@ a {
     padding: 22px;
 }
 
+.history-card--editable {
+    display: block;
+}
+
+.history-card__content {
+    display: grid;
+    gap: 14px;
+}
+
+.history-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    gap: 16px;
+}
+
 .preview-card {
     border-radius: 24px;
     padding: 18px;
@@ -546,6 +562,43 @@ a {
     font-weight: 700;
 }
 
+.record-note {
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.6;
+}
+
+.record-edit-form,
+.record-delete-form {
+    margin-top: 4px;
+}
+
+.record-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.danger-button {
+    border-color: rgba(180, 35, 24, 0.22);
+    color: var(--danger);
+}
+
+.inline-status {
+    min-height: 1.2em;
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--muted);
+}
+
+.inline-status.is-success {
+    color: var(--primary-dark);
+}
+
+.inline-status.is-error {
+    color: var(--danger);
+}
+
 .empty-state,
 .placeholder p {
     color: var(--muted);
@@ -742,6 +795,10 @@ a {
 
     .history-card,
     .result-status {
+        flex-direction: column;
+    }
+
+    .history-card__header {
         flex-direction: column;
     }
 
