@@ -8,6 +8,17 @@ import tensorflow as tf
 from sklearn.cluster import MiniBatchKMeans
 
 
+_original_depthwise_init = tf.keras.layers.DepthwiseConv2D.__init__
+
+
+def _patched_depthwise_init(self, *args, **kwargs):
+    kwargs.pop('groups', None)
+    _original_depthwise_init(self, *args, **kwargs)
+
+
+tf.keras.layers.DepthwiseConv2D.__init__ = _patched_depthwise_init
+
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 MODEL_PATH = BASE_DIR / 'models' / 'verifai_model_final.h5'
 METADATA_PATH = BASE_DIR / 'models' / 'verifai_model_meta.json'

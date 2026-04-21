@@ -28,6 +28,19 @@ class SignUpForm(UserCreationForm):
         self.fields['password1'].widget.attrs.update({'placeholder': 'Create a password'})
         self.fields['password2'].widget.attrs.update({'placeholder': 'Confirm password'})
 
+    def clean_password1(self):
+        return self.cleaned_data.get('password1')
+
+    def _post_clean(self):
+        existing_password2_errors = list(self._errors.get('password2', []))
+        super()._post_clean()
+        if 'password2' in self._errors:
+            self._errors['password2'] = type(self._errors['password2'])(existing_password2_errors)
+            if not existing_password2_errors:
+                del self._errors['password2']
+        if 'password1' in self._errors:
+            del self._errors['password1']
+
 
 class DetectionUploadForm(forms.Form):
     FILE_TYPE_CHOICES = [
