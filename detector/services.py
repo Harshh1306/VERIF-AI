@@ -254,7 +254,7 @@ def predict_video(uploaded_file):
             selected_indices.append(int(np.argmin(distances)))
         selected_indices = sorted(set(selected_indices))
 
-    selected_probabilities = probabilities[selected_indices]
+    selected_probabilities = 1.0 - probabilities[selected_indices]
     mean_real_probability = float(np.mean(selected_probabilities))
     mean_fake_probability = float(1.0 - mean_real_probability)
     real_votes = int(np.sum(selected_probabilities >= 0.5))
