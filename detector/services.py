@@ -147,8 +147,13 @@ def _save_upload_temporarily(uploaded_file):
 
 
 def _predict_probabilities_and_embeddings(batch_array):
-    predictions, embeddings = get_inference_model().predict(batch_array, verbose=0)
-    return predictions.reshape(-1), embeddings
+    outputs = get_inference_model().predict(batch_array, verbose=0)
+    predictions, embeddings = outputs[0], outputs[1]
+    if isinstance(predictions, list):
+        predictions = predictions[0]
+    if isinstance(embeddings, list):
+        embeddings = embeddings[0]
+    return np.asarray(predictions).reshape(-1), np.asarray(embeddings)
 
 
 def _classify_score(real_probability):
@@ -170,7 +175,10 @@ def predict_image(uploaded_file):
         )
 
     batch = _prepare_image_array([frame])
-    real_probability = float(get_model().predict(batch, verbose=0).reshape(-1)[0])
+    raw_prediction = get_model().predict(batch, verbose=0)
+    if isinstance(raw_prediction, list):
+        raw_prediction = raw_prediction[0]
+    real_probability = float(np.asarray(raw_prediction).reshape(-1)[0])
     fake_probability = float(1.0 - real_probability)
     label, confidence = _classify_score(real_probability)
 
